@@ -5,6 +5,9 @@ import java.awt.*;
 import java.net.URL;
 
 public class Milestone1_2 {
+
+    /*=========================================================================================================
+    Elements that will be at the top of the frame.*/
     public static void top(JFrame frame0){
         JPanel north = new JPanel();
         north.setLayout(new BoxLayout(north, BoxLayout.X_AXIS));
@@ -21,6 +24,8 @@ public class Milestone1_2 {
         nPanel.add(checkBox1);
         nPanel.add(checkBox2);
     }
+    /*=========================================================================================================
+    Elements that will be at the right of the frame.*/
     public static void right(JFrame frame0){
 
         JPanel east = new JPanel();
@@ -41,15 +46,18 @@ public class Milestone1_2 {
         ePanel.add(jrb1);
         ePanel.add(jrb2);
     }
+    /*=========================================================================================================
+    Elements that will be at the middle of the frame.*/
     public static void middle(JFrame frame0){
         JPanel center = new JPanel();
         center.setLayout(new GridLayout(2, 2));
         frame0.add(center, BorderLayout.CENTER);
         for(int i = 0; i < 4; i++) {
-
             center.add(new JLabel(new ImageIcon ("./src/Milestone1/1.png")));
         }
     }
+    /*=========================================================================================================
+    Elements that will be at the bottom of the frame.*/
     public static void down(JFrame frame0){
         JPanel south = new JPanel();
         south.setLayout(new BoxLayout(south, BoxLayout.X_AXIS));
@@ -61,7 +69,8 @@ public class Milestone1_2 {
         sPanel.add(new JButton("But1"));
         sPanel.add(new JButton("But2"));
     }
-
+    /*=========================================================================================================
+        Creation of the frame and call to the methods.*/
     public static void showFrame(){
         JFrame frame0 = new JFrame("FrameDemo");
         frame0.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -70,16 +79,10 @@ public class Milestone1_2 {
         Container container = frame0.getContentPane();
         container.setLayout(new BorderLayout());
 
-
         top(frame0);
-
-
         right(frame0);
-
         middle(frame0);
-
         down(frame0);
-
 
         frame0.pack();
         frame0.setVisible(true);

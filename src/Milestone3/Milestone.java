@@ -106,10 +106,8 @@ public class Milestone extends JFrame{
             Creation of the LogIn.*/
     public static void logIn() {
         JOptionPane login = new JOptionPane();
-        login.showConfirmDialog (null,"Entrada","Input password:", JOptionPane.YES_NO_OPTION);
-        JPasswordField passwordText = new JPasswordField(20);
-        passwordText.setBounds(100, 40, 160, 25);
-        login.add(passwordText);
+        login.showInputDialog("Input password");
+
 
     }
     public static void main(String[] args) {

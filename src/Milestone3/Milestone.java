@@ -7,94 +7,67 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 
-public class Milestone {
+public class Milestone extends JFrame{
     static JFrame frame0;
     static JTextArea textArea;
     static JComboBox combo;
 
+    /*=========================================================================================================
+        Elements that will be at the left of the frame.*/
     public static void west(Container frame0) {
         JPanel westPanel = new JPanel();
         westPanel.setLayout(new BoxLayout(westPanel, BoxLayout.Y_AXIS));
-        westPanel.setBorder(new EmptyBorder(20,20,20,20));
-        westPanel.setPreferredSize(new Dimension(200,200));
+        westPanel.setBorder(new EmptyBorder(20,20,20,0));
+        westPanel.setPreferredSize(new Dimension(300,200));
+
+        JPanel conb= new JPanel();
+        JPanel img= new JPanel();
+        JPanel check = new JPanel();
+
         combo = new JComboBox();
-        combo.setSize(new Dimension(195,100));
-        combo.setBorder(new EmptyBorder(0,0,20,0));
+        combo.setSize(new Dimension(100,50));
+        combo.setBorder(new EmptyBorder(0,0,10,0));
         combo.addItem("1.jpeg");
         combo.addItem("2.jpg");
         combo.addItem("3.jpeg");
         combo.addItem("4.jpeg");
-
+        JLabel imgs = new JLabel();
+        imgs.setIcon(new ImageIcon("img/1.jpeg"));
         combo.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                File originalFile = new File("img/1.jpeg");
-                FileInputStream inStream=null;
-                try {
-                    inStream = new FileInputStream(originalFile);
-
-                    byte buffer [] = new byte[512];
-                    int value =0;
-                    while (value!=-1){
-                        value = inStream.read(buffer);
-                    }
-                } catch (FileNotFoundException e) {
-                    throw new RuntimeException(e);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                } finally {
-                    if (inStream != null) {
-                        try {
-                            inStream.close();
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                }
-                /*textArea.setText("");
-                FileReader reader = null;
-                try {
-                    reader = new FileReader("img/" + combo.getSelectedItem().toString());
-                } catch (FileNotFoundException e) {
-                    JOptionPane.showMessageDialog(null, "File not found!", "Alert", JOptionPane.ERROR_MESSAGE);
-                    //System.out.println("file not found");
-                }
-                try {
-                    textArea.read(reader, "img/" + combo.getSelectedItem().toString());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }*/
+                imgs.setIcon(new ImageIcon("img/" + combo.getSelectedItem().toString()));
             }
         });
-
-
-
-        textArea = new JTextArea();
-        textArea.setLineWrap(true);
-
-        textArea.setEditable(false);
-        textArea.setPreferredSize(new Dimension(200,100));
-
-
-        FileReader reader = null;
-        try {
-            reader = new FileReader("img/1.jpeg");
-        } catch (FileNotFoundException e) {
-            JOptionPane.showMessageDialog(null, "File not found!", "Alert", JOptionPane.ERROR_MESSAGE);
-        }
-        try {
-            textArea.read(reader, "img/1.jpeg");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        westPanel.add(combo);
-        westPanel.add(textArea);
+        JCheckBox saveOrNot = new JCheckBox("Save your comment");
+        conb.add(combo);
+        img.add(imgs);
+        check.add(saveOrNot);
+        westPanel.add(conb);
+        westPanel.add(img);
+        westPanel.add(check);
         frame0.add("West", westPanel);
     }
 
-    public static void east(Container frame0) {}
+    public static void middle(Container frame0) {
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        centerPanel.setBorder(new EmptyBorder(20,0,20,20));
+        centerPanel.setPreferredSize(new Dimension(250,200));
 
+        JPanel text = new JPanel();
+        text.setBorder(new EmptyBorder(390,10,10,10));
+
+        TextField comment= new TextField(30);
+        comment.setSize(new Dimension(45, 10));
+
+        text.add(comment);
+        centerPanel.add(text);
+        frame0.add("Center", centerPanel);
+    }
+
+    /*=========================================================================================================
+        Elements that will be at the bottom of the frame.*/
     public static void south (Container frame0) {
         JPanel southP = new JPanel();
         southP.setBorder(new EmptyBorder(10,400,10,10));
@@ -105,7 +78,6 @@ public class Milestone {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 System.exit(0);
-                //this.frame.dispose();
             }
         });
 
@@ -113,26 +85,36 @@ public class Milestone {
         frame0.add("South", southP);
     }
 
+    /*=========================================================================================================
+            Creation of the frame and call to the methods.*/
     public static void GUI() {
         frame0 = new JFrame("Test events: files");
         frame0.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame0.setLayout(new BorderLayout());
-        frame0.setPreferredSize(new Dimension(500,600));
-
-
+        frame0.setPreferredSize(new Dimension(600,600));
 
 
         west(frame0);
-
+        middle(frame0);
         south(frame0);
 
         frame0.pack();
         frame0.setLocationRelativeTo(null);
         frame0.setVisible(true);
     }
+    /*=========================================================================================================
+            Creation of the LogIn.*/
+    public static void logIn() {
+        JOptionPane login = new JOptionPane();
+        login.showConfirmDialog (null,"Entrada","Input password:", JOptionPane.YES_NO_OPTION);
+        JPasswordField passwordText = new JPasswordField(20);
+        passwordText.setBounds(100, 40, 160, 25);
+        login.add(passwordText);
 
+    }
     public static void main(String[] args) {
-        GUI();
+        logIn();
+        /*GUI();*/
     }
 }
 

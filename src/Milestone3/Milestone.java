@@ -105,9 +105,17 @@ public class Milestone extends JFrame{
     /*=========================================================================================================
             Creation of the LogIn.*/
     public static void logIn() {
-        JOptionPane login = new JOptionPane();
-        login.showInputDialog("Input password");
-
+        String pass =  "anboto";
+        String password = JOptionPane.showInputDialog
+                (null, "Input password", "KAI-FOOD", JOptionPane.QUESTION_MESSAGE );
+        if(password.equals("anboto"))
+        {
+            GUI();
+        }
+        else {
+            JOptionPane.showMessageDialog
+                    (null, "invalid user id and password", "KAI-FOOD", JOptionPane.ERROR_MESSAGE);
+        }
 
     }
     public static void main(String[] args) {

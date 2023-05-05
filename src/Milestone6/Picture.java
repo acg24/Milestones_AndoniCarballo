@@ -2,7 +2,7 @@ package Milestone6;
 
 import java.util.Date;
 
-public class Pictures {
+public class Picture {
     private int PictureId;
     private String Title;
     private Date Date;

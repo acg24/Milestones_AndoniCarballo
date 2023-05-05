@@ -1,11 +1,7 @@
 package Milestone6;
-
 import org.jdesktop.swingx.JXDatePicker;
-
 import javax.swing.*;
 import java.awt.*;
-
-
 public class GUI extends JFrame {
     public static void photrographer(Container frame0){
         JPanel phtgrphr = new JPanel();
@@ -17,7 +13,6 @@ public class GUI extends JFrame {
         comboN.addItem("tres");
         phtgrphr.add(name);
         phtgrphr.add(comboN);
-
         frame0.add(phtgrphr);
     }
     public static void date(Container frame0){
@@ -31,7 +26,6 @@ public class GUI extends JFrame {
     public static void imgsName(Container frame0){
         JPanel names = new JPanel();
 
-
         JList imgList=new JList();
         imgList.setPreferredSize(new Dimension(350,125));
         DefaultListModel element = new DefaultListModel();
@@ -42,9 +36,6 @@ public class GUI extends JFrame {
 
         JScrollPane scrollLista = new JScrollPane(imgList);
         imgList.setLayoutOrientation(JList.VERTICAL);
-
-
-
 
         names.add(imgList);
         frame0.add(names);
@@ -83,7 +74,6 @@ public class GUI extends JFrame {
         frame0.setVisible(true);
     }
     public void getPhotographers(){
-
     }
     public static void main(String[] args) {
 

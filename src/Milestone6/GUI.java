@@ -1,82 +1,74 @@
 package Milestone6;
 import org.jdesktop.swingx.JXDatePicker;
 import javax.swing.*;
+import javax.swing.event.ListSelectionListener;
+
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.sql.Date;
+import java.sql.SQLException;
+import java.util.List;
+
 public class GUI extends JFrame {
-    public static void photrographer(Container frame0){
-        JPanel phtgrphr = new JPanel();
 
-        JLabel name = new JLabel("Photographer: ");
-        JComboBox comboN = new JComboBox();
-        comboN.addItem("uno");
-        comboN.addItem("dos");
-        comboN.addItem("tres");
-        phtgrphr.add(name);
-        phtgrphr.add(comboN);
-        frame0.add(phtgrphr);
-    }
-    public static void date(Container frame0){
-        JPanel dateLabel = new JPanel();
-        JLabel text = new JLabel("Photos after  ");
-        JXDatePicker date =  new JXDatePicker();
-        dateLabel.add(text);
-        dateLabel.add(date);
-        frame0.add(dateLabel);
-    }
-    public static void imgsName(Container frame0){
-        JPanel names = new JPanel();
+    private static final long serialVersionUID = 1L;
+    private static JComboBox<String> photographersComboBox;
+    private static JXDatePicker datePicker;
+    private JList<Picture> pictureList;
+    private JLabel pictureLabel;
 
-        JList imgList=new JList();
-        imgList.setPreferredSize(new Dimension(350,125));
-        DefaultListModel element = new DefaultListModel();
-        for (int index = 0; index < 20; index++) {
-            element.addElement("Elemento " + index);
+    public GUI(List<Photographer> photographers, List<Picture> pictures) {
+        super("Picture Viewer");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // Create the components
+        photographersComboBox = new JComboBox<>(photographers.toArray(new String[0]));
+        photographersComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                updatePictureList(dbconnector.getPictures(photographersComboBox.getSelectedIndex(), (Date) datePicker.getDate()));
+            }
+        });
+        datePicker = new JXDatePicker();
+        pictureList = new JList<>(new DefaultListModel<>());
+        pictureList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        pictureList.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent e) {
+                Picture selectedPicture = pictureList.getSelectedValue();
+                if (selectedPicture != null) {
+                    pictureLabel.setIcon(new ImageIcon(String.valueOf(selectedPicture.getPhotographerId())));
+                }
+            }
+        });
+        pictureLabel = new JLabel();
+        JPanel contentPane = new JPanel(new GridLayout(2, 2));
+        contentPane.add(photographersComboBox);
+        contentPane.add(datePicker);
+        contentPane.add(new JScrollPane(pictureList));
+        contentPane.add(pictureLabel);
+        getContentPane().add(contentPane, BorderLayout.CENTER);
+        updatePictureList(pictures);
+        pack();
+        setVisible(true);
+    }
+
+    private void updatePictureList(List<Picture> pictures) {
+        DefaultListModel<Picture> model = (DefaultListModel<Picture>) pictureList.getModel();
+        model.clear();
+        for (Picture picture : pictures) {
+            if (picture.getPhotographer().equals(photographersComboBox.getSelectedItem())
+                    && picture.getDate().equals(datePicker.getDate())) {
+                model.addElement(picture);
+            }
         }
-        imgList.setModel(element);
-
-        JScrollPane scrollLista = new JScrollPane(imgList);
-        imgList.setLayoutOrientation(JList.VERTICAL);
-
-        names.add(imgList);
-        frame0.add(names);
-    }
-    public static void abajoderecha(Container frame0){
-        String src = "vangogh1.jpg";
-        JPanel img= new JPanel();
-        JLabel imgs = new JLabel();
-        imgs.setPreferredSize(new Dimension(300,125));
-
-        Image photo = new ImageIcon("img/milestone6/" + src).getImage();
-        photo = photo.getScaledInstance(250,200,Image.SCALE_SMOOTH);
-        ImageIcon loogooo = new ImageIcon(photo);
-        imgs.setIcon(loogooo);
-        img.add(imgs);
-        frame0.add(img);
+        if (model.getSize() > 0) {
+            pictureList.setSelectedIndex(0);
+        }
     }
 
-    /*=========================================================================================================
-            Creation of the frame and call to the methods.*/
-    public static void ShowGUI(){
-        JFrame frame0 = new GUI();
-        frame0.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame0.setLayout(new GridLayout(2,2));
-        frame0.setPreferredSize(new Dimension(700,300));
-
-        photrographer(frame0);
-        date(frame0);
-        imgsName(frame0);
-        abajoderecha(frame0);
-
-
-
-        frame0.pack();
-        frame0.setLocationRelativeTo(null);
-        frame0.setVisible(true);
-    }
-    public void getPhotographers(){
-    }
-    public static void main(String[] args) {
-
-        ShowGUI();
+    public static void main(String[] args) throws SQLException {
+            new GUI(dbconnector.getPhotographers(), dbconnector.getPictures(photographersComboBox.getSelectedIndex(), (Date) datePicker.getDate()));
     }
 }

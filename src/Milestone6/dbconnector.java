@@ -1,77 +1,116 @@
 package Milestone6;
 import java.sql.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 public class dbconnector {
-    /*Connection connection = null;
-    public dbconnector() {
-        try {
-            connection = DriverManager.getConnection(
-                    "jdbc:mariadb://localhost:3306/milestone6",
-                    "root", "root"
-            );
-            System.out.println("The conexion is opened.");
-        } catch (SQLException e) {
-            System.out.println("ERROR. The conexion failed");
-        }
-    }
-    public void close() {
-        try {
-            if (connection != null) {
-                connection.close();
-            }
-            System.out.println("The conexion is closed.");
-        } catch (SQLException e) {
-            System.out.println("ERROR. The connexion is not correctly closed");
-        }
-    }
-    public void statment(){
-        String[] person= new String[3];
-        try (PreparedStatement statement = connection.prepareStatement("""
-            SELECT PhotographerId, Name, Awared
-            FROM Photographers
-            WHERE PhotographerId =  PhotographerId
-             """)) {
-            ResultSet rs = statement.executeQuery();
-            while (rs.next()) {
+    private static final String URL = "jdbc:mariadb://localhost:3306/milestone6";
+    private static final String USERNAME = "root";
+    private static final String PASSWORD = "root";
 
-                System.out.print("ID: " + rs.getInt("PhotographerId"));
-                System.out.print("| Name: " + rs.getString("Name"));
-                System.out.println("| Awared: " + rs.getBoolean("Awared"));
-            }
+    private static Connection conn;
+
+    static {
+        try {
+            conn = DriverManager.getConnection(URL, USERNAME, PASSWORD);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }*/
-    private Connection con;
-    private static final String url = "jdbc:mariadb://localhost:3306/kevin";
-    private static final String user = "root";
-    private static final String pass = "root";
+    }
+
     public dbconnector(){
-        Connection con = null;
         try {
-            con = DriverManager.getConnection(url,user,pass);
-            System.out.println("Conected :)");
+            conn = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+            System.out.println("Connected!");
         } catch (SQLException e) {
-            System.out.println("The connection failed :(");
+            System.out.println("NOT CONECTED");
         }
     }
-    public void con(){
-        if (con != null){
-            try {
-                con.close();
-                System.out.println(" Connection closed :)");
-            } catch (SQLException e) {
-                System.out.println("The connection is not correctly closed  :(");
+
+
+    public static List<Photographer> getPhotographers() throws SQLException {
+        List<Photographer> photographers = new ArrayList<>();
+        String query = "SELECT * FROM Photographers";
+        try (Statement statement = conn.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            while (resultSet.next()) {
+                int id = resultSet.getInt("PhotographerId");
+                String name = resultSet.getString("Name");
+                int awardedInt = resultSet.getInt("Awared");
+                boolean awarded = (awardedInt != 0);
+                Photographer photographer = new Photographer(id, name, awarded);
+                photographers.add(photographer);
             }
         }
+        return photographers;
     }
-    public List<Photographer> getPhotographer(){
-        List<Photographer> photographerList =new ArrayList<Photographer>();
 
+    public static Photographer getPhotographerById(int id) {
+        String query = "SELECT * FROM Photographers WHERE PhotographerId = ?";
 
-        return photographerList;
+        try (Connection connection = conn;
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                String name = resultSet.getString("Name");
+                Boolean awared = resultSet.getBoolean("Awarded");
+                return new Photographer(id, name, awared);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static void incrementVisits(Picture picture) throws SQLException {
+        String query = "UPDATE Pictures SET Visits = Visits + 1 WHERE PictureId = ?";
+        try (PreparedStatement preparedStatement = conn.prepareStatement(query)) {
+            preparedStatement.setInt(1, picture.getId());
+            preparedStatement.executeUpdate();
+        }
+    }
+
+    public static List<Picture> getPictures(int photographerIndex, Date datePicker) {
+        List<Picture> myPictureList = new ArrayList<Picture>();
+        PreparedStatement myStatement = null;
+        ResultSet myResultset = null;
+
+        try {
+            if(datePicker != null) {
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                String datePickerString = df.format(datePicker);
+                System.out.println(datePickerString);
+                myStatement = conn.prepareStatement("SELECT * FROM Pictures WHERE PhotographerId = ? AND date > ?");
+                myStatement.setInt(1, dbconnector.getPhotographers().get(photographerIndex).getId());
+                myStatement.setString(2, datePickerString);
+            } else {
+                myStatement = conn.prepareStatement("SELECT * FROM Pictures WHERE PhotographerId = ?;");
+                myStatement.setInt(1, dbconnector.getPhotographers().get(photographerIndex).getId());
+            }
+            myResultset = myStatement.executeQuery();
+
+            while(myResultset.next()){
+                int pictureId = myResultset.getInt("PictureId");
+                String title = myResultset.getString("Title");
+                Date date = myResultset.getDate("Date");
+                String file = myResultset.getString("File");
+                int visits = myResultset.getInt("Visits");
+                int photographerId = myResultset.getInt("PhotographerId");
+
+                myPictureList.add(new Picture(pictureId, title, date, file, visits, dbconnector.getPhotographers().get(photographerIndex).getId()));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return myPictureList;
     }
 }
 

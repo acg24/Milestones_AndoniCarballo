@@ -1,74 +1,148 @@
 package Milestone6;
-import org.jdesktop.swingx.JXDatePicker;
-import javax.swing.*;
-import javax.swing.event.ListSelectionListener;
 
+
+import org.jdesktop.swingx.JXDatePicker;
+
+
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
+import java.awt.event.*;
 import java.sql.Date;
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+
 public class GUI extends JFrame {
+    dbconnector conn;
+    private JComboBox combo;
+    private DefaultComboBoxModel comboModel;
+    private JXDatePicker datePicker;
+    private DefaultListModel listModel;
+    private ImageIcon img;
+    private JLabel pickLabel;
 
-    private static final long serialVersionUID = 1L;
-    private static JComboBox<String> photographersComboBox;
-    private static JXDatePicker datePicker;
-    private JList<Picture> pictureList;
-    private JLabel pictureLabel;
-
-    public GUI(List<Photographer> photographers, List<Picture> pictures) {
-        super("Picture Viewer");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        // Create the components
-        photographersComboBox = new JComboBox<>(photographers.toArray(new String[0]));
-        photographersComboBox.addActionListener(new ActionListener() {
+    public void addComponentsToPanel1(Container panel1) {
+        JLabel label1 = new JLabel("Photographer: ");
+        comboModel = new DefaultComboBoxModel<String>();
+        List<Milestone6.Photographer> myPhotographers = new ArrayList<Milestone6.Photographer>() ;
+        myPhotographers = conn.getPhotographers();
+        Iterator<Photographer> it = myPhotographers.iterator();
+        while(it.hasNext()){
+            String name = it.next().getName();
+            comboModel.addElement(name);
+        }
+        combo = new JComboBox(comboModel);
+        combo.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                updatePictureList(dbconnector.getPictures(photographersComboBox.getSelectedIndex(), (Date) datePicker.getDate()));
+                addPictures();
             }
         });
+        panel1.add(label1);
+        panel1.add(combo);
+    }
+
+    public void addComponentsToPanel2(Container panel2) {
+        JLabel label2 = new JLabel("Photos after: ");
         datePicker = new JXDatePicker();
-        pictureList = new JList<>(new DefaultListModel<>());
-        pictureList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        pictureList.addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent e) {
-                Picture selectedPicture = pictureList.getSelectedValue();
-                if (selectedPicture != null) {
-                    pictureLabel.setIcon(new ImageIcon(String.valueOf(selectedPicture.getPhotographerId())));
+        datePicker.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                addPictures();
+            }
+        });
+        panel2.add(datePicker);
+    }
+
+    public void addPictures() {
+        listModel.removeAllElements();
+        List<Milestone6.Picture> myPictures = conn.getPictures(combo.getSelectedIndex(), datePicker.getDate());
+        Iterator<Milestone6.Picture> it = myPictures.iterator();
+        while(it.hasNext()) {
+            listModel.addElement(it.next().getTitle());
+        }
+    }
+
+
+
+    public void addComponentsToPanel3(Container panel3) {
+        listModel = new DefaultListModel<String>();
+        JList list = new JList(listModel);
+        list.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(e.getClickCount() == 2) {
+                    List<Picture> myPictures = conn.getPictures(combo.getSelectedIndex(), datePicker.getDate());
+                    System.out.println(myPictures.get(list.getSelectedIndex()).getFile());
+                    img = new ImageIcon("img/milestone6/" + myPictures.get(list.getSelectedIndex()).getFile());
+                    img.setImage(img.getImage().getScaledInstance(200,100,1));
+                    pickLabel.setIcon(img);
                 }
             }
         });
-        pictureLabel = new JLabel();
-        JPanel contentPane = new JPanel(new GridLayout(2, 2));
-        contentPane.add(photographersComboBox);
-        contentPane.add(datePicker);
-        contentPane.add(new JScrollPane(pictureList));
-        contentPane.add(pictureLabel);
-        getContentPane().add(contentPane, BorderLayout.CENTER);
-        updatePictureList(pictures);
-        pack();
-        setVisible(true);
+        addPictures();
+        JScrollPane scrollPane = new JScrollPane(list, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setPreferredSize(new Dimension(270,100));
+        panel3.add(scrollPane);
     }
 
-    private void updatePictureList(List<Picture> pictures) {
-        DefaultListModel<Picture> model = (DefaultListModel<Picture>) pictureList.getModel();
-        model.clear();
-        for (Picture picture : pictures) {
-            if (picture.getPhotographer().equals(photographersComboBox.getSelectedItem())
-                    && picture.getDate().equals(datePicker.getDate())) {
-                model.addElement(picture);
+    public void addComponentsToPanel4(Container panel4) {
+
+        img = new ImageIcon("nothing");
+        img.setImage(img.getImage().getScaledInstance(200,100,1));
+        pickLabel = new JLabel();
+        pickLabel.setIcon(img);
+
+        panel4.add(pickLabel);
+    }
+
+    public GUI() {
+        Container p = this.getContentPane();
+        this.setDefaultCloseOperation(this.EXIT_ON_CLOSE);
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                conn.closeCon();
             }
-        }
-        if (model.getSize() > 0) {
-            pictureList.setSelectedIndex(0);
-        }
+        });
+        this.setLayout(new GridLayout(2, 2));
+        this.setPreferredSize(new Dimension(600,200));
+
+        conn = new dbconnector();
+
+        JPanel panel1 = new JPanel();
+        panel1.setPreferredSize(new Dimension(300,100));
+        panel1.setBorder(new EmptyBorder(10,20,10,10));
+        addComponentsToPanel1(panel1);
+        this.add(panel1);
+
+        JPanel panel2 = new JPanel();
+        panel2.setPreferredSize(new Dimension(300,100));
+        panel2.setBorder(new EmptyBorder(10,10,10,20));
+        addComponentsToPanel2(panel2);
+        this.add(panel2);
+
+        JPanel panel3 =new JPanel();
+        panel3.setPreferredSize(new Dimension(300,100));
+        panel3.setBorder(new EmptyBorder(10,20,20,10));
+        addComponentsToPanel3(panel3);
+        this.add(panel3);
+
+        JPanel panel4 = new JPanel();
+        panel4.setPreferredSize(new Dimension(300,100));
+        panel4.setBorder(new EmptyBorder(10,20,20,10));
+        addComponentsToPanel4(panel4);
+        this.add(panel4);
+
+        this.pack();
+        this.setLocationRelativeTo(null);
+        this.setVisible(true);
     }
 
-    public static void main(String[] args) throws SQLException {
-            new GUI(dbconnector.getPhotographers(), dbconnector.getPictures(photographersComboBox.getSelectedIndex(), (Date) datePicker.getDate()));
+    public static void main(String[] args) {
+        Milestone6.GUI myPictureViewer = new Milestone6.GUI();
     }
 }

@@ -1,26 +1,27 @@
 package Milestone6;
 
+
 import java.util.Date;
 
 public class Picture {
-    private int id;
+    private int pictureId;
     private String title;
     private Date date;
     private String file;
     private int visits;
-    private int photographerId;
+    private Milestone6.Photographer photographer;
 
-    public Picture(int id, String title, Date date, String file, int visits, int photographerId) {
-        this.id = id;
+    public Picture(int pictureId, String title, Date date, String file, int visits, Milestone6.Photographer photographer) {
+        this.pictureId = pictureId;
         this.title = title;
         this.date = date;
         this.file = file;
         this.visits = visits;
-        this.photographerId = photographerId;
+        this.photographer = photographer;
     }
 
-    public int getId() {
-        return id;
+    public int getPictureId() {
+        return pictureId;
     }
 
     public String getTitle() {
@@ -39,20 +40,7 @@ public class Picture {
         return visits;
     }
 
-    public void incrementVisits() {
-        visits++;
-    }
-
-    public int getPhotographerId() {
-        return photographerId;
-    }
-
     public Photographer getPhotographer() {
-        return dbconnector.getPhotographerById(1);
-    }
-
-    @Override
-    public String toString() {
-        return title;
+        return photographer;
     }
 }

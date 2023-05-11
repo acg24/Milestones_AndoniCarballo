@@ -1,18 +1,18 @@
 package Milestone6;
 
 public class Photographer {
-    private int id;
+    private int photographerId;
     private String name;
     private boolean awarded;
 
-    public Photographer(int id, String name, boolean awarded) {
-        this.id = id;
+    public Photographer(int photographerId, String name, boolean awarded) {
+        this.photographerId = photographerId;
         this.name = name;
         this.awarded = awarded;
     }
 
-    public int getId() {
-        return id;
+    public int getPhotographerId() {
+        return photographerId;
     }
 
     public String getName() {
@@ -25,6 +25,10 @@ public class Photographer {
 
     @Override
     public String toString() {
-        return name;
+        return "Photographer{" +
+                "photographerId=" + photographerId +
+                ", name='" + name + '\'' +
+                ", awarded=" + awarded +
+                '}';
     }
 }

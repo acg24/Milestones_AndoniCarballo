@@ -31,7 +31,8 @@ public class GUI extends JFrame {
         awardButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-               // award();
+                String inputValue = JOptionPane.showInputDialog("Minimum number of visits for getting a prize: ");
+                myPhotographerManager.award(Integer.parseInt(inputValue));
             }
         });
         panel1.add(awardButton);
@@ -42,9 +43,7 @@ public class GUI extends JFrame {
         removeButton.setPreferredSize(new Dimension(200, 50));
         removeButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                //remove();
-            }
+            public void actionPerformed(ActionEvent actionEvent) {myPhotographerManager.remove();}
         });
         panel2.add(removeButton);
     }

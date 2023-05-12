@@ -25,7 +25,7 @@ public class GUI extends JFrame {
     private ImageIcon image;
     private JLabel pickLabel;
 
-    public void addComponentsToPanel1(Container panel1) {
+    public void addComponentsToPanel1(JFrame frame) {
         awardButton = new JButton("AWARD");
         awardButton.setPreferredSize(new Dimension(200, 50));
         awardButton.addActionListener(new ActionListener() {
@@ -35,20 +35,20 @@ public class GUI extends JFrame {
                 myPhotographerManager.award(Integer.parseInt(inputValue));
             }
         });
-        panel1.add(awardButton);
+        frame.add(awardButton);
     }
 
-    public void addComponentsToPanel2(Container panel2) {
+    public void addComponentsToPanel2(JFrame frame) {
         removeButton = new JButton("REMOVE");
         removeButton.setPreferredSize(new Dimension(200, 50));
         removeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {myPhotographerManager.remove();}
         });
-        panel2.add(removeButton);
+        frame.add(removeButton);
     }
 
-    public void addComponentsToPanel3(Container panel3) {
+    public void addComponentsToPanel3(JPanel panel3) {
         JLabel label3 = new JLabel("Photographer: ");
         comboBoxModel = new DefaultComboBoxModel<String>();
         List<Photographer> myPhotographers = new ArrayList<Photographer>() ;
@@ -133,19 +133,13 @@ public class GUI extends JFrame {
             }
         });
         this.setLayout(new GridLayout(3, 2));
-        this.setPreferredSize(new Dimension(600,450));
+        this.setPreferredSize(new Dimension(600,350));
 
         myPhotographerManager = new DBConnector();
 
-        JPanel panel1 = new JPanel();
-        panel1.setBorder(new EmptyBorder(20,20,10,10));
-        addComponentsToPanel1(panel1);
-        this.add(panel1);
+        addComponentsToPanel1(this);
 
-        JPanel panel2 = new JPanel();
-        panel2.setBorder(new EmptyBorder(20,10,10,20));
-        addComponentsToPanel2(panel2);
-        this.add(panel2);
+        addComponentsToPanel1(this);
 
         JPanel panel3 = new JPanel();
         panel3.setPreferredSize(new Dimension(300,100));

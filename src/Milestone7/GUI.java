@@ -139,7 +139,7 @@ public class GUI extends JFrame {
 
         addComponentsToPanel1(this);
 
-        addComponentsToPanel1(this);
+        addComponentsToPanel2(this);
 
         JPanel panel3 = new JPanel();
         panel3.setPreferredSize(new Dimension(300,100));

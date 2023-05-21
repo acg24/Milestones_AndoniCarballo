@@ -15,14 +15,14 @@ public class DBConnector {
     private Connection conn;
     private static final String driver = "org.mariadb.jdbc.Driver";
     private static final String url = "jdbc:mariadb://localhost:3306/milestone6";
-    private static final String username = "root";
+    private static final String userName = "root";
     private static final String password = "root";
 
     public DBConnector () {
         conn = null;
         try {
             Class.forName(driver);
-            conn = DriverManager.getConnection(url, username, password);
+            conn = DriverManager.getConnection(url, userName, password);
             System.out.println("Connected!");
         } catch (ClassNotFoundException e) {
             System.out.println("NOT CONECTED");
@@ -54,10 +54,10 @@ public class DBConnector {
                 rs = stmnt.getResultSet();
 
                 while (rs.next()) {
-                    int photographerId = rs.getInt("PhotographerId");
-                    String name = rs.getString("Name");
+                    int PhotographerId = rs.getInt("PhotographerId");
+                    String Name = rs.getString("Name");
                     Boolean awarded = rs.getBoolean("Awared");
-                    PhotographersList.add(new Photographer(photographerId, name, awarded));
+                    PhotographersList.add(new Photographer(PhotographerId, Name, awarded));
                 }
             }
         } catch (SQLException e) {
@@ -68,19 +68,19 @@ public class DBConnector {
     }
 
 
-    public List<Picture> getPictures(int photographerIndex, Date datePicker) {
+    public List<Picture> getPictures(int photographerIndex, Date DatePicker) {
         List<Picture> PicturesList = new ArrayList<Picture>();
         PreparedStatement stmnt = null;
         ResultSet rs = null;
 
         try {
-            if(datePicker != null) {
+            if(DatePicker != null) {
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                String datePickerString = df.format(datePicker);
-                System.out.println(datePickerString);
+                String DatePickerString = df.format(DatePicker);
+                System.out.println(DatePickerString);
                 stmnt = conn.prepareStatement("SELECT * FROM Pictures WHERE PhotographerId = ? AND Date > ?");
                 stmnt.setInt(1, this.getPhotographers().get(photographerIndex).getPhotographerId());
-                stmnt.setString(2, datePickerString);
+                stmnt.setString(2, DatePickerString);
             } else {
                 stmnt = conn.prepareStatement("SELECT * FROM Pictures WHERE PhotographerId = ?;");
                 stmnt.setInt(1, this.getPhotographers().get(photographerIndex).getPhotographerId());
@@ -88,14 +88,14 @@ public class DBConnector {
             rs = stmnt.executeQuery();
 
             while(rs.next()){
-                int pictureId = rs.getInt("PictureId");
-                String title = rs.getString("Title");
-                Date date = rs.getDate("Date");
-                String file = rs.getString("File");
-                int visits = rs.getInt("Visits");
-                int photographerId = rs.getInt("PhotographerId");
+                int PictureId = rs.getInt("PictureId");
+                String Title = rs.getString("Title");
+                Date Date = rs.getDate("Date");
+                String File = rs.getString("File");
+                int Visits = rs.getInt("Visits");
+                int PhotographerId = rs.getInt("PhotographerId");
 
-                PicturesList.add(new Picture(pictureId, title, date, file, visits, this.getPhotographers().get(photographerIndex)));
+                PicturesList.add(new Picture(PictureId, Title, Date, File, Visits, this.getPhotographers().get(photographerIndex)));
             }
 
         } catch (SQLException e) {
@@ -103,7 +103,7 @@ public class DBConnector {
         }
         return PicturesList;
     }
-    public Map<Integer, Integer> visitsMap() {
+    public Map<Integer, Integer> VisitsMap() {
         Map<Integer, Integer> myVisitsMap = new HashMap<Integer, Integer>();
         Statement stmnt = null;
         ResultSet rs = null;
@@ -111,22 +111,22 @@ public class DBConnector {
         try {
             stmnt = conn.createStatement();
 
-            if(stmnt.execute("SELECT * FROM pictures;")){
+            if(stmnt.execute("SELECT * FROM Pictures;")){
                 rs = stmnt.getResultSet();
 
                 while(rs.next()) {
-                    int pictureId = rs.getInt("pictureId");
-                    String title = rs.getString("title");
-                    Date date = rs.getDate("date");
-                    String file = rs.getString("file");
-                    int visits = rs.getInt("visits");
-                    int photographerId = rs.getInt("photographerId");
+                    int PictureId = rs.getInt("PictureId");
+                    String Title = rs.getString("Title");
+                    Date Date = rs.getDate("Date");
+                    String File = rs.getString("File");
+                    int Visits = rs.getInt("Visits");
+                    int PhotographerId = rs.getInt("PhotographerId");
 
-                    if(myVisitsMap.containsKey(photographerId)) {
-                        visits += myVisitsMap.get(photographerId);
+                    if(myVisitsMap.containsKey(PhotographerId)) {
+                        Visits += myVisitsMap.get(PhotographerId);
                     }
-                    System.out.println(photographerId + ": " + visits);
-                    myVisitsMap.put(photographerId, visits);
+                    System.out.println(PhotographerId + ": " + Visits);
+                    myVisitsMap.put(PhotographerId, Visits);
                 }
             }
 
@@ -137,22 +137,22 @@ public class DBConnector {
         return myVisitsMap;
     }
     public void award(int minVisits) {
-        Map<Integer, Integer> VisitsMap = visitsMap();
+        Map<Integer, Integer> VisitsMap = VisitsMap();
         Iterator<Integer> it = VisitsMap.keySet().iterator();
         while(it.hasNext()){
-            int photographerId = it.next();
-            int visits = VisitsMap.get(photographerId);
-            if(visits >= minVisits) {
+            int PhotographerId = it.next();
+            int Visits = VisitsMap.get(PhotographerId);
+            if(Visits >= minVisits) {
                 try {
-                    PreparedStatement stmnt = conn.prepareStatement("SELECT * FROM photographers WHERE photographerId = ?;");
-                    stmnt.setInt(1, photographerId);
+                    PreparedStatement stmnt = conn.prepareStatement("SELECT * FROM Photographers WHERE PhotographerId = ?;");
+                    stmnt.setInt(1, PhotographerId);
                     ResultSet rs = stmnt.executeQuery();
                     rs.next();
                     int awards = rs.getInt("awarded");
 
-                    stmnt = conn.prepareStatement("UPDATE photographers SET awarded = ? WHERE photographerId = ?");
+                    stmnt = conn.prepareStatement("UPDATE Photographers SET awarded = ? WHERE PhotographerId = ?");
                     stmnt.setInt(1, (awards+1));
-                    stmnt.setInt(2,photographerId);
+                    stmnt.setInt(2,PhotographerId);
                     stmnt.executeUpdate();
 
                 } catch (SQLException e) {
@@ -168,24 +168,24 @@ public class DBConnector {
 
         try {
             myStatement = conn.createStatement();
-            if(myStatement.execute("SELECT * FROM pictures;")){
+            if(myStatement.execute("SELECT * FROM Pictures;")){
                 myResultset = myStatement.getResultSet();
 
                 while(myResultset.next()){
-                    int pictureId = myResultset.getInt("pictureId");
-                    String title = myResultset.getString("title");
-                    Date date = myResultset.getDate("date");
-                    String file = myResultset.getString("file");
-                    int visits = myResultset.getInt("visits");
-                    int photographerId = myResultset.getInt("photographerId");
+                    int PictureId = myResultset.getInt("PictureId");
+                    String Title = myResultset.getString("Title");
+                    Date Date = myResultset.getDate("Date");
+                    String File = myResultset.getString("File");
+                    int Visits = myResultset.getInt("Visits");
+                    int PhotographerId = myResultset.getInt("PhotographerId");
 
-                    System.out.println(pictureId + ": " + visits);
+                    System.out.println(PictureId + ": " + Visits);
 
-                    if(visits == 0) {
-                        int selected_option= JOptionPane.showConfirmDialog(null,"Delete " + file + "?","Confirm delete",JOptionPane.YES_NO_OPTION);
+                    if(Visits == 0) {
+                        int selected_option= JOptionPane.showConfirmDialog(null,"Delete " + File + "?","Confirm delete",JOptionPane.YES_NO_OPTION);
                         if(selected_option == 0) {
 
-                            Map<Integer, Integer> myVisitsMap = visitsMap();
+                            Map<Integer, Integer> myVisitsMap = VisitsMap();
                             Iterator<Integer> it = myVisitsMap.keySet().iterator();
                             while(it.hasNext()){
                                 int id = it.next();
@@ -193,8 +193,8 @@ public class DBConnector {
                                 if(vists == 0) {
                                     int selected_option2 = JOptionPane.showConfirmDialog(null,"Delete photographer?","Confirm delete",JOptionPane.YES_NO_OPTION);
                                     if(selected_option2 == 0) {
-                                        PreparedStatement myPreparedStatement2 = conn.prepareStatement("DELETE FROM photographers WHERE photographerId = ?");
-                                        myPreparedStatement2.setInt(1, photographerId);
+                                        PreparedStatement myPreparedStatement2 = conn.prepareStatement("DELETE FROM Photographers WHERE PhotographerId = ?");
+                                        myPreparedStatement2.setInt(1, PhotographerId);
                                         myPreparedStatement2.executeUpdate();
                                         FileWriter foS = new FileWriter("secondoption.txt");
                                         foS.write("otra vez!");
@@ -202,8 +202,8 @@ public class DBConnector {
                                     }
                                 }
                             }
-                            PreparedStatement myPreparedStatement = conn.prepareStatement("DELETE FROM pictures WHERE pictureId = ?");
-                            myPreparedStatement.setInt(1, pictureId);
+                            PreparedStatement myPreparedStatement = conn.prepareStatement("DELETE FROM Pictures WHERE PictureId = ?");
+                            myPreparedStatement.setInt(1, PictureId);
                             myPreparedStatement.executeUpdate();
                             System.out.println("firstoption");
                         }

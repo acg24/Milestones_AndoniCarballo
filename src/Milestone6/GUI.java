@@ -50,11 +50,10 @@ public class GUI extends JFrame {
         datePicker = new JXDatePicker();
         datePicker.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent actionEvent) {
+            public void actionPerformed(ActionEvent e) {
                 addPictures();
             }
         });
-        panel2.add(datePicker);
     }
 
     public void addPictures() {
